@@ -1526,6 +1526,11 @@ function secure_html5_video_player_add_header() {
 		print "<script src='{$plugin_dir}/video-js/video.js' type='text/javascript' ></script>\n";
 		//print "<script type='text/javascript' > videojs.setupAllWhenReady(); </script>\n";
 	}
+        print "<style>
+                .vjs-disable-progress .vjs-progress-control {
+                    visibility: hidden;
+                }
+                </style>";
 }
 endif;
 
@@ -1557,9 +1562,9 @@ function secure_html5_video_player_shortcode_video($atts) {
     'loop' => get_option('secure_html5_video_player_default_loop'),
     'controls' => get_option('secure_html5_video_player_default_controls'),
     'youtube' => '',
-    'vimeo' => ''
+    'vimeo' => '',
+    'progress' => ''
   ), $atts));
-	
 	if (!$width || $width <= 0) {
 		$width = '640';
 	}
@@ -1776,10 +1781,11 @@ function secure_html5_video_player_shortcode_video($atts) {
                 $attr_parts = array();
                 $control_bar_attributes = array();
                 
-                if(FALSE){
+                if($progress == strtolower('yes') || $progress == strtolower('true') ){
                     $progress_control = '"ProgressControl": { "children": {"SeekBar":{"children": {'.
                             '"LoadProgressBar": false, "PlayProgressBar": false, "SeekHandle": false'.
                             '}}}}';
+                    $progress_attribute = "vjs-disable-progress";
                     //$control_bar_attributes[] = 'ProgressControl';
                 }else{
                     $progress_control = NULL;
@@ -1869,7 +1875,7 @@ function secure_html5_video_player_shortcode_video($atts) {
 		
 		if ($bd->isMobileBrowser()) {
 			// iOS and Android devices
-			$video_tag .= "<video data-setup='{{$attr_str}}' class='video-js sh5vp-video vjs-default-skin {$center_play}' onclick='this.play();' width='{$width}' height='{$height}' {$poster_attribute}     >\n";
+                        $video_tag .= "<video data-setup='{{$attr_str}}' class='video-js sh5vp-video vjs-default-skin {$center_play} {$progress_attribute}' onclick='this.play();' width='{$width}' height='{$height}' {$poster_attribute}     >\n";
 			if ($mp4_source) {
 				$video_tag .= "{$mp4_source}\n";
 			}
@@ -1901,7 +1907,7 @@ function secure_html5_video_player_shortcode_video($atts) {
 				$video_tag .= "<iframe id='{$object_tag_id}' type='text/html' width='{$width}' height='{$height}' src='{$plugin_dir}/fallback/index.php?autoplay={$fallback_autoplay}&mp4={$fallback_mp4}&url={$fallback_plugin_dir}' frameborder='0' /></iframe>\n";
 			}
 			else { 
-				$video_tag .= "<video data-setup='{{$attr_str}}' class='video-js sh5vp-video vjs-default-skin {$center_play}' width='{$width}' height='{$height}' {$poster_attribute}     >\n";
+				$video_tag .= "<video data-setup='{{$attr_str}}' class='video-js sh5vp-video vjs-default-skin {$center_play} {$progress_attribute}' width='{$width}' height='{$height}' {$poster_attribute}     >\n";
 				if ($mp4_source) {
 					$video_tag .= "{$mp4_source}\n";
 				}
