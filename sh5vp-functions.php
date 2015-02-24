@@ -1520,11 +1520,11 @@ function secure_html5_video_player_add_header() {
 	$plugin_dir = plugins_url('secure-html5-video-player');
 	if ($secure_html5_video_player_skin != 'native') {
 		print "<link rel='stylesheet' href='{$plugin_dir}/video-js/video-js.css' type='text/css' />\n";
-		if ($secure_html5_video_player_skin != 'videojs') {
-			print "<link rel='stylesheet' href='{$plugin_dir}/video-js/skins/".$secure_html5_video_player_skin.".css' type='text/css' />\n";
-		}
+//		if ($secure_html5_video_player_skin != 'videojs') {
+//			print "<link rel='stylesheet' href='{$plugin_dir}/video-js/skins/".$secure_html5_video_player_skin.".css' type='text/css' />\n";
+//		}
 		print "<script src='{$plugin_dir}/video-js/video.js' type='text/javascript' ></script>\n";
-		print "<script type='text/javascript' > VideoJS.setupAllWhenReady(); </script>\n";
+		//print "<script type='text/javascript' > videojs.setupAllWhenReady(); </script>\n";
 	}
 }
 endif;
@@ -1766,42 +1766,50 @@ function secure_html5_video_player_shortcode_video($atts) {
 		}else{
                     $ogg_source = NULL;
                 }
+                
+                if(TRUE){
+                    $center_play = "vjs-big-play-centered";
+                }else{
+                    $center_play = "";
+                }
 	
 		if ($poster) {
 			$poster_attribute = 'poster="'.$poster.'"';
 		}else{
                     $poster_attribute ='';
                 }
+                
+                $attributes = array();
 	
 		if ($preload == 'yes' || $preload == 'true') {
-			$preload_attribute = 'preload="auto"';
+			$preload_attribute = ',"preload": "auto"';
 		}
 		else {
-			$preload_attribute = 'preload="none"';
+			$preload_attribute = '';
 		}
 	
 		if ($autoplay == 'yes' || $autoplay == 'true') {
-			$autoplay_attribute = 'autoplay="autoplay"';
+                        $attributes[] = 'autoplay';
 			$fallback_autoplay = '1';
 		}
 		else {
-			$autoplay_attribute = "";
 			$fallback_autoplay = '0';
 		}
 	
 		if ($loop == 'yes' || $loop == 'true') {
-			$loop_attribute = 'loop="loop"';
-		}
-		else {
-			$loop_attribute = "";
+                        $attributes[] = 'loop';
 		}
 	
 		if ($controls != 'no' && $controls != 'false') {
-			$controls_attribute = 'controls="controls"';
+                        $attributes[] = 'controls';
 		}
-		else {
-			$controls_attribute = "";
-		}
+                if(empty($attributes)){
+                    $attr_str = '';
+                }else if(count($attributes)==1){
+                    $attr_str = '"'.$attributes[0].'": true'.$preload_attribute;
+                }else{
+                    $attr_str = '"'.implode('": true, "', $attributes).'": true'.$preload_attribute;
+                }
 		
 		$video_tag_skin = '';
 		if ($secure_html5_video_player_skin != 'videojs') {
@@ -1811,7 +1819,7 @@ function secure_html5_video_player_shortcode_video($atts) {
 		
 		if ($bd->isMobileBrowser()) {
 			// iOS and Android devices
-			$video_tag .= "<video class='video-js sh5vp-video' onclick='this.play();' width='{$width}' height='{$height}' {$poster_attribute} {$controls_attribute} {$preload_attribute} {$autoplay_attribute} {$loop_attribute} >\n";
+			$video_tag .= "<video data-setup='{{$attr_str}}' class='video-js sh5vp-video vjs-default-skin {$center_play}' onclick='this.play();' width='{$width}' height='{$height}' {$poster_attribute}     >\n";
 			if ($mp4_source) {
 				$video_tag .= "{$mp4_source}\n";
 			}
@@ -1842,8 +1850,8 @@ function secure_html5_video_player_shortcode_video($atts) {
 			else if ($bd->isFirefox() && ($bd->versionFirefox() < 21 || $bd->isMac()) && $mp4 && !($ogg || $webm)) {
 				$video_tag .= "<iframe id='{$object_tag_id}' type='text/html' width='{$width}' height='{$height}' src='{$plugin_dir}/fallback/index.php?autoplay={$fallback_autoplay}&mp4={$fallback_mp4}&url={$fallback_plugin_dir}' frameborder='0' /></iframe>\n";
 			}
-			else {
-				$video_tag .= "<video class='video-js sh5vp-video' width='{$width}' height='{$height}' {$poster_attribute} {$controls_attribute} {$preload_attribute} {$autoplay_attribute} {$loop_attribute} >\n";
+			else { 
+				$video_tag .= "<video data-setup='{{$attr_str}}' class='video-js sh5vp-video vjs-default-skin {$center_play}' width='{$width}' height='{$height}' {$poster_attribute}     >\n";
 				if ($mp4_source) {
 					$video_tag .= "{$mp4_source}\n";
 				}
