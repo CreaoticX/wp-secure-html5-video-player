@@ -1772,7 +1772,60 @@ function secure_html5_video_player_shortcode_video($atts) {
                 }else{
                     $center_play = "";
                 }
-	
+                
+                $attr_parts = array();
+                $control_bar_attributes = array();
+                
+                if(FALSE){
+                    $progress_control = '"ProgressControl": { "children": {"SeekBar":{"children": {'.
+                            '"LoadProgressBar": false, "PlayProgressBar": false, "SeekHandle": false'.
+                            '}}}}';
+                    //$control_bar_attributes[] = 'ProgressControl';
+                }else{
+                    $progress_control = NULL;
+                }
+
+                if(FALSE){
+                    $control_bar_attributes[] = 'FullscreenToggle';
+                }
+                
+                if(FALSE){
+                    $control_bar_attributes[] = 'CurrentTimeDisplay';
+                }
+                
+                if(FALSE ){
+                    $control_bar_attributes[] = 'DurationDisplay';
+                }
+                
+                if(FALSE){
+                    $control_bar_attributes[] = 'VolumeControl';
+                }
+                
+                if(TRUE){
+                    $control_bar_attributes[] = 'MuteToggle';
+                }
+                
+                if(in_array('CurrentTimeDisplay', $control_bar_attributes) || in_array('DurationDisplay', $control_bar_attributes)){
+                    $control_bar_attributes[] = 'TimeDivider';
+                }
+                
+                if(empty($control_bar_attributes)){
+                    if($progress_control != NULL){
+                        $control_bar_attr_str = $progress_control;
+                    }
+                }else if(count($control_bar_attributes)==1){
+                    $control_bar_attr_str = '"'.$control_bar_attributes[0].'": false';
+                    if($progress_control != NULL){
+                        $control_bar_attr_str = implode(', ', array($control_bar_attr_str,$progress_control));
+                    }
+                }else{
+                    $control_bar_attr_str = '"'.implode('": false, "', $control_bar_attributes).'": false';
+                    if($progress_control != NULL){
+                        $control_bar_attr_str = implode(', ', array($control_bar_attr_str,$progress_control));
+                    }
+                }
+                $attr_parts[] = '"children": { "controlBar": { "children": {'.$control_bar_attr_str.'}}}';
+		
 		if ($poster) {
 			$poster_attribute = 'poster="'.$poster.'"';
 		}else{
@@ -1782,10 +1835,7 @@ function secure_html5_video_player_shortcode_video($atts) {
                 $attributes = array();
 	
 		if ($preload == 'yes' || $preload == 'true') {
-			$preload_attribute = ',"preload": "auto"';
-		}
-		else {
-			$preload_attribute = '';
+			$attr_parts[] = '"preload": "auto"';
 		}
 	
 		if ($autoplay == 'yes' || $autoplay == 'true') {
@@ -1803,13 +1853,13 @@ function secure_html5_video_player_shortcode_video($atts) {
 		if ($controls != 'no' && $controls != 'false') {
                         $attributes[] = 'controls';
 		}
-                if(empty($attributes)){
-                    $attr_str = '';
-                }else if(count($attributes)==1){
-                    $attr_str = '"'.$attributes[0].'": true'.$preload_attribute;
-                }else{
-                    $attr_str = '"'.implode('": true, "', $attributes).'": true'.$preload_attribute;
+                
+                if(count($attributes)==1){
+                    $attr_parts[] = '"'.$attributes[0].'": true';
+                }else if(count($attributes) > 1){
+                    $attr_parts[] = '"'.implode('": true, "', $attributes).'": true';
                 }
+                $attr_str = implode(", ", $attr_parts);
 		
 		$video_tag_skin = '';
 		if ($secure_html5_video_player_skin != 'videojs') {
