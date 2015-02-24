@@ -2,46 +2,44 @@
 /*
 Plugin Name: Secure HTML5 Video Player
 Plugin URI: http://www.trillamar.com/webcraft/secure-html5-video-player/
-Description: An enhanced video plugin for WordPress built on the VideoJS HTML5 video player library.  Settings can be easily configured with a control panel and simplified short codes.  Video files can be served from a secured private directory. 
+Description: Secure HTML5 Video Player allows you to play HTML5 video on modern browsers. Videos can be served privately; pseudo-streamed from a secured directory or via S3. 
 Author: Lucinda Brown, Jinsoo Kang
-Version: 2.1
+Version: 3.12
 Author URI: http://www.trillamar.com/
-License: LGPLv3
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-$secure_html5_video_player_is_android = preg_match("/android/i", $_SERVER['HTTP_USER_AGENT']);
-$secure_html5_video_player_is_explorer7 = preg_match("/msie 7/i", $_SERVER['HTTP_USER_AGENT']);
-$secure_html5_video_player_is_explorer8 = preg_match("/msie 8/i", $_SERVER['HTTP_USER_AGENT']);
-$secure_html5_video_player_is_ios = preg_match("/mobile/i", $_SERVER['HTTP_USER_AGENT']) && preg_match("/safari/i", $_SERVER['HTTP_USER_AGENT']);
+/*
+	Copyright (c) 2011 Lucinda Brown <info@trillamar.com>
+	Copyright (c) 2011 Jinsoo Kang <info@trillamar.com>
+
+	Secure HTML5 Video Player is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+$secure_html5_video_player_cache_ttl = 180;
 
 
-
+require_once('sh5vp-browser-detect.php');
 require_once('sh5vp-functions.php');
 require_once('sh5vp-widgets.php');
 require_once('sh5vp-metabox.php');
+require_once('sh5vp-init.php');
+
 register_activation_hook(__FILE__, 'secure_html5_video_player_install');
 
-add_action('wp_head', 'secure_html5_video_player_add_header');
-add_action('admin_menu', 'secure_html5_video_player_menu');
-add_action('plugins_loaded', 'secure_html5_video_player_plugins_loaded');
-
-add_shortcode('video', 'secure_html5_video_player_shortcode_video');
-
-
-
-if ( !function_exists('secure_html5_video_player_menu') ):
-function secure_html5_video_player_menu() {
-	add_options_page(
-		__('Secure HTML5 Video Player', 'secure-html5-video-player'),
-		__('Secure HTML5 Video Player', 'secure-html5-video-player'),
-		'manage_options',
-		__FILE__,
-		'secure_html5_video_player_options'
-	);
-}
-endif;
-
-
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'secure_html5_video_player_plugin_action_links', 10, 2);
 
 /**
 	Selects a media server from the list of available media servers using the client
@@ -62,11 +60,11 @@ endif;
 */
 if ( !function_exists('secure_html5_video_player_get_media_server_address') ):
 function secure_html5_video_player_get_media_server_address($client_ip, $video_filename) {
-	$has_media_server = ('yes' == get_option('secure_html5_video_player_enable_media_server'));
+	$has_media_server = secure_html5_video_player_has_media_server();
 	if ($has_media_server) {
+		$server_list = secure_html5_video_player_media_server_address_list();
 		$chksum = crc32($client_ip);
 		if ($chksum < 0) $chksum = -1 * $chksum;
-		$server_list = secure_html5_video_player_media_server_address_list();
 
 		if ($video_filename) {
 			$server_filelist = secure_html5_video_player_filelist(true);
