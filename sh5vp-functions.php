@@ -1494,7 +1494,10 @@ function secure_html5_video_player_accessKey($filename) {
 	$secure_html5_video_player_key_seed = get_option('secure_html5_video_player_key_seed');
 	$script_tz = date_default_timezone_get();
 	//date_default_timezone_set('America/Los_Angeles');
-	date_default_timezone_set(get_option('timezone_string'));
+        $wp_time = get_option('timezone_string');
+        if($wp_time != ''){
+            date_default_timezone_set(get_option('timezone_string'));
+        }
 	$f = '';
 	if ($filename) {
 		$f = secure_html5_video_player_filename_no_ext($filename);
