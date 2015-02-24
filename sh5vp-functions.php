@@ -2007,7 +2007,10 @@ function secure_html5_video_player_media_url($secure_html5_video_player_video_di
 	}
 
 	$script_tz = date_default_timezone_get();
-	date_default_timezone_set(get_option('timezone_string'));
+        $wp_time = get_option('timezone_string');
+        if($wp_time != ''){
+            date_default_timezone_set(get_option('timezone_string'));
+        }
 	$date_str = date('Ymd');
 	date_default_timezone_set($script_tz);
 
@@ -2101,7 +2104,10 @@ endif;
 if ( !function_exists('secure_html5_video_player_footer_cleanup') ):
 function secure_html5_video_player_footer_cleanup() {
 	$script_tz = date_default_timezone_get();
-	date_default_timezone_set(get_option('timezone_string'));
+        $wp_time = get_option('timezone_string');
+        if($wp_time != ''){
+            date_default_timezone_set(get_option('timezone_string'));
+        }
 	$date_str = date('Ymd');
 	$date_str_yesterday = date('Ymd', time() - 86400);
 	date_default_timezone_set($script_tz);
