@@ -150,6 +150,9 @@ final class SH5VP_BrowserDetect {
 	private function tokensAreInSequence($ary) {
 		$last_t = NULL;
 		foreach ($ary as $curr => $val) {
+                        if(!isset($this->__tokens[ $val ])){
+                            return FALSE;
+                        }
 			$curr_token = $this->__tokens[ $val ];
 			if ($curr_token == NULL) return FALSE;
 			$curr_t = $curr_token['t'];
