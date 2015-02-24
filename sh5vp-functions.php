@@ -2031,7 +2031,7 @@ function secure_html5_video_player_media_url($secure_html5_video_player_video_di
 	$video_cache_dir_index3 = '';
 	
 	$last_slash_pos = strrpos($filename_normalized_ext, '/');
-	if (last_slash_pos !== FALSE) {
+	if ($last_slash_pos !== FALSE) {
 		$video_cache_dir_index3 = $video_cache_dir . substr($filename_normalized_ext, 0, $last_slash_pos);
 	}
 	
