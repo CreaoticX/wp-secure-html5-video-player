@@ -1754,18 +1754,24 @@ function secure_html5_video_player_shortcode_video($atts) {
 			$webm_source = '<source src="'.$webm.'" type="video/webm" />';
 			$webm_link = '<a class="sh5vp-link-webm" href="'.$webm.'">WebM</a>';
 			$count_file_exists++;
-		}
+		}else{
+                    $webm_source = NULL;
+                }
 	
 		// Ogg source supplied
 		if ($ogg) {
 			$ogg_source = '<source src="'.$ogg.'" type="video/ogg" />';
 			$ogg_link = '<a class="sh5vp-link-ogg" href="'.$ogg.'">Ogg</a>';
 			$count_file_exists++;
-		}
+		}else{
+                    $ogg_source = NULL;
+                }
 	
 		if ($poster) {
 			$poster_attribute = 'poster="'.$poster.'"';
-		}
+		}else{
+                    $poster_attribute ='';
+                }
 	
 		if ($preload == 'yes' || $preload == 'true') {
 			$preload_attribute = 'preload="auto"';
